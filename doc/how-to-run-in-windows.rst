@@ -1,4 +1,4 @@
-Haskell, GHC and Cabal in Windows
+How to use Cabal in Windows
 =================================
 
 The Windows toolchain and environment
