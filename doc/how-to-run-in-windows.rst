@@ -10,14 +10,6 @@ Windows API. MinGW does not offer a complete developer environment so it usually
 is coupled with `MSYS2 <https://www.msys2.org/>`_ which provides many UNIX-like
 tools such as ``bash``, ``make`` or the package manager ``pacman``.
 
-MSYS2 comes with different environments. You can learn more about the different
-environments in the `MSYS2 documentation
-<https://www.msys2.org/docs/environments/>`_. We will be using ``UCRT64`` in the
-examples below but it can be swapped by ``CLANG64`` (as long as the external
-packages you want to use are available for the ``CLANG64`` environment, see
-:ref:`Using system libraries with GHC`).
-In the following examples, ``<environment>`` will refer to the environment used.
-
 .. note::
 
     Most distributions of Haskell for Windows, including
@@ -44,6 +36,12 @@ Packages can be installed in an MSYS2 environment via the ``pacman`` package
 manager. Refer to `MSYS2 package management documentation
 <https://www.msys2.org/docs/package-management/>`_ for details.
 
+.. note::
+    When working in the MSYS2 environment bundled with GHCup and Stack, it is
+    recommended to only install packages with the prefix ``mingw64/``.
+    Alternately, ``ucrt64/`` or ``clang64/`` may be suitable for some purposes.
+    In the following examples, ``<environment>`` will refer to the prefix used.
+
 Once the package is installed, the appropriate location of the libraries should
 be given to GHC, for example if compiling something that depends on
 ``libssl.a``:
@@ -58,11 +56,10 @@ Using Cabal on Windows
 ----------------------
 
 All the above extra configurations will also be needed when using ``cabal``, and
-one can provide all of them via the following local project file:
+one can provide all of them using the following Cabal configuration fields:
 
 ::
 
-   package *
      extra-include-dirs: <MSYS>\<environment>\include
      extra-lib-dirs: <MSYS>\<environment>\lib
      extra-prog-path: <MSYS>\<environment>\bin,
@@ -73,36 +70,23 @@ Note that ``extra-include-dirs: x`` translates to the GHC option ``-Ix``,
 ``extra-prog-path: x`` results in the path ``x`` being added to the ``PATH``
 environment when calling an executable by cabal.
 
-However, this has the inconvenience that we would need to set this up for every
-project that we want to build, and we sometimes wouldn't be able to install
-binaries from Hackage directly as there is no local project to refer to.
-
-The recommended way of setting this is then modifying the global cabal
-configuration, whose location you can find by calling ``cabal --help``:
-
-::
-
-   > cabal --help
-   ...
-   You can edit the cabal configuration file to set defaults:
-      C:\Users\<YourName>\AppData\Roaming\cabal\config
-
-In there, just add the lines mentioned above.
-::
-
-   > cat C:\\Users\\<YourName>\\AppData\\Roaming\\cabal\\config
-   ...
-   extra-include-dirs: C:\msys64\ucrt64\include
-   ...
-   extra-lib-dirs: C:\msys64\ucrt64\lib
-   ...
-   extra-prog-path: C:\ghcup\bin,
-                    C:\Users\<YourName>\AppData\Roaming\cabal\bin,
-                    C:\msys64\ucrt64\bin,
-                    C:\msys64\usr\bin
-   ...
-
+It is recommended to add these fields to
+:ref:`the user-wide global configuration <config-file-discovery>`.
+This is so the MSYS2 environment is used for every package, including those
+downloaded from repositories such as Hackage or Stackage.
 
 .. note::
-    If Cabal was installed via a tool such as GHCup and Stack, this file
-    should have already been configured as needed.
+    If Cabal was installed via a tool such as GHCup and Stack, the global
+    configuration should have already been set up as needed.
+
+In some cases, it may be useful to set these flags project-locally. Since
+the paths may differ between Haskell installations, it is recommmended to
+add the following to ``cabal.project.local``:
+
+::
+
+   package *
+     extra-include-dirs: <MSYS>\<environment>\include
+     extra-lib-dirs: <MSYS>\<environment>\lib
+     extra-prog-path: <MSYS>\<environment>\bin,
+                      C:\msys64\usr\bin
