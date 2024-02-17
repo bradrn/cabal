@@ -4,6 +4,11 @@ How to use Cabal in Windows
 The Windows toolchain and environment
 -------------------------------------
 
+In general, Cabal should not require any Windows-specific configuration. The
+major exception is when external C libraries are required, in which case those
+libraries must be installed if not yet present, and Cabal must be informed of
+their location.
+
 `MinGW <https://www.mingw-w64.org/>`_ is a set of software packages for the
 Windows platform that enable development and compilation targeting the native
 Windows API. MinGW does not offer a complete developer environment so it usually
@@ -31,6 +36,9 @@ tools such as ``bash``, ``make`` or the package manager ``pacman``.
 
 Using system libraries with GHC
 -------------------------------
+
+To understand how to set up Cabal to use system libraries on Windows, it is
+useful to first understand how to install these libraries and use them with GHC.
 
 Packages can be installed in an MSYS2 environment via the ``pacman`` package
 manager. Refer to `MSYS2 package management documentation
